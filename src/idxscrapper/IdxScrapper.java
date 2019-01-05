@@ -9,6 +9,8 @@ import entity.IdxScrap;
 import entity.IdxScrapPK;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -30,241 +32,250 @@ public class IdxScrapper {
      * @throws java.lang.Exception
      */
     public static void main(String[] args) throws Exception {
-        String month = "January";
-        String date = "3";
-        String year = "2019";
 
-        String tanggal = year + "-" + month + "-" + date;
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat fmts = new SimpleDateFormat("yyyy-MMMM-dd");
-        Date dd = fmts.parse(tanggal);
-        String tanggalDB = formatter.format(dd);
+        Date startDate = formatter.parse("2015-01-14");
+        Date endDate = formatter.parse("2018-12-30");
+        LocalDate start = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate end = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        System.err.println(System.getProperty("user.dir"));
-        String OS = System.getProperty("os.name").toLowerCase();
+        for (LocalDate dates = start; dates.isBefore(end); dates = dates.plusDays(1)) {
 
-        if (OS.contains(
-                "win")) {
-            // declaration and instantiation of objects/variables
-            System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-win64\\geckodriver.exe");
+            String month = dates.getMonth().toString();
+            String date = String.valueOf(dates.getDayOfMonth());
+            String year = String.valueOf(dates.getYear());
 
-        } else if (OS.contains(
-                "nix") || OS.contains("nux") || OS.indexOf("aix") > 0) {
+            String tanggal = year + "-" + month + "-" + date;
+            Date dd = fmts.parse(tanggal);
+            String tanggalDB = formatter.format(dd);
 
-            // declaration and instantiation of objects/variables
-            System.err.println("System.getProperty(\"user.dir\") " + System.getProperty("user.dir"));
-            System.setProperty("webdriver.firefox.marionette", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-linux64\\geckodriver");
-        } else {
-            // declaration and instantiation of objects/variables
-            throw new Exception("OS tidak di kenali");
-        }
-        WebDriver driver = new FirefoxDriver();
-        //comment the above 2 lines and uncomment below 2 lines to use Chrome
-        //System.setProperty("webdriver.chrome.driver","G:\\chromedriver.exe");
-        //WebDriver driver = new ChromeDriver();
+            System.err.println(System.getProperty("user.dir"));
+            String OS = System.getProperty("os.name").toLowerCase();
 
-        String baseUrl = "https://www.idx.co.id/data-pasar/ringkasan-perdagangan/ringkasan-saham/";
+            if (OS.contains(
+                    "win")) {
+                // declaration and instantiation of objects/variables
+                System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-win64\\geckodriver.exe");
 
-        // launch Fire fox and direct it to the Base URL
-        driver.get(baseUrl);
+            } else if (OS.contains(
+                    "nix") || OS.contains("nux") || OS.indexOf("aix") > 0) {
 
-        new WebDriverWait(driver,
-                6000).until(
-                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
-        Thread.sleep(
-                100);
-        clickInput(driver);
+                // declaration and instantiation of objects/variables
+                System.err.println("System.getProperty(\"user.dir\") " + System.getProperty("user.dir"));
+                System.setProperty("webdriver.firefox.marionette", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-linux64\\geckodriver");
+            } else {
+                // declaration and instantiation of objects/variables
+                throw new Exception("OS tidak di kenali");
+            }
+            WebDriver driver = new FirefoxDriver();
+            //comment the above 2 lines and uncomment below 2 lines to use Chrome
+            //System.setProperty("webdriver.chrome.driver","G:\\chromedriver.exe");
+            //WebDriver driver = new ChromeDriver();
 
-        WebElement dateBox = driver.findElement(By.xpath("//*[@id=\"dateFilter\"]"));
-        WebElement yearInput = driver.findElement(By.xpath("/html/body/div/div[1]/div/div/input"));
-        WebElement monthInput = driver.findElement(By.xpath("/html/body/div/div[1]/div/span"));
-        WebElement leftMonthSelect = driver.findElement(By.xpath("/html/body/div/div[1]/span[1]"));
-        WebElement cariButton = driver.findElement(By.xpath("/html/body/main/div[1]/div[5]/button"));
-        WebElement info = driver.findElement(By.xpath("//*[@id=\"stockTable_info\"]"));
-        WebElement infoShow100 = driver.findElement(By.xpath("/html/body/main/div[2]/div/div[1]/div/div[1]/label/select/option[4]"));
-        dateBox.click();
-        yearInput.clear();
-        yearInput.sendKeys(year);
-        while (!monthInput.getText().equals(month)) {
-            leftMonthSelect.click();
-        }
+            String baseUrl = "https://www.idx.co.id/data-pasar/ringkasan-perdagangan/ringkasan-saham/";
 
-        dateBox.click();
+            // launch Fire fox and direct it to the Base URL
+            driver.get(baseUrl);
 
-        Thread.sleep(
-                1000);
+            new WebDriverWait(driver,
+                    6000).until(
+                    webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+            Thread.sleep(
+                    100);
+            clickInput(driver);
 
-        WebElement dataWidget = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[2]/div"));
-        List<WebElement> columns = dataWidget.findElements(By.className("flatpickr-day"));
+            WebElement dateBox = driver.findElement(By.xpath("//*[@id=\"dateFilter\"]"));
+            WebElement yearInput = driver.findElement(By.xpath("/html/body/div/div[1]/div/div/input"));
+            WebElement monthInput = driver.findElement(By.xpath("/html/body/div/div[1]/div/span"));
+            WebElement leftMonthSelect = driver.findElement(By.xpath("/html/body/div/div[1]/span[1]"));
+            WebElement cariButton = driver.findElement(By.xpath("/html/body/main/div[1]/div[5]/button"));
+            WebElement info = driver.findElement(By.xpath("//*[@id=\"stockTable_info\"]"));
+            WebElement infoShow100 = driver.findElement(By.xpath("/html/body/main/div[2]/div/div[1]/div/div[1]/label/select/option[4]"));
+            dateBox.click();
+            while (!monthInput.getText().toLowerCase().equals(month.toLowerCase())) {
+                leftMonthSelect.click();
+            }
+            yearInput.clear();
+            yearInput.sendKeys(year);
+
+            dateBox.click();
+
+            Thread.sleep(
+                    1000);
+
+            WebElement dataWidget = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[2]/div"));
+            List<WebElement> columns = dataWidget.findElements(By.className("flatpickr-day"));
 
 //        System.err.println(
 //                "==================================================");
 //        System.err.println(columns.size());
-        int i = 1;
-        for (WebElement cell : columns) {
-            //Select xx. Date
+            int i = 1;
+            for (WebElement cell : columns) {
+                //Select xx. Date
 //            System.err.println(cell.getText() + "tagname" + cell.getTagName() + "xpath" + cell.getAttribute("xpath") + "gettext" + cell.getAttribute("innerHTML") + cell.getAttribute("class"));
-            if (cell.getAttribute("class").contains("prevMonthDay") || cell.getAttribute("class").contains("nextMonthDay")) {
+                if (cell.getAttribute("class").contains("prevMonthDay") || cell.getAttribute("class").contains("nextMonthDay")) {
 
-            } else if (cell.getAttribute("innerHTML").equals(date)) {
-                String cellString = cell.toString();
-                String cellAfet = cellString.substring(cellString.lastIndexOf("xpath:"));
-                String cellFinal = cellAfet.substring(0, cellAfet.lastIndexOf("->"));
-                String cellFinals = cellFinal.substring(0, cellFinal.lastIndexOf("]]")).trim();
-                String cellFinalss = cellFinals.replace("xpath:", "").trim();
+                } else if (cell.getAttribute("innerHTML").equals(date)) {
+                    String cellString = cell.toString();
+                    String cellAfet = cellString.substring(cellString.lastIndexOf("xpath:"));
+                    String cellFinal = cellAfet.substring(0, cellAfet.lastIndexOf("->"));
+                    String cellFinals = cellFinal.substring(0, cellFinal.lastIndexOf("]]")).trim();
+                    String cellFinalss = cellFinals.replace("xpath:", "").trim();
 
 //                System.err.println(cellFinalss + "/span[" + i + "]");
 //                System.err.println(
 //                        driver.findElement(By.xpath(cellFinalss + "/span[" + i + "]")).getAttribute("innerHTML"));
-                driver.findElement(By.xpath(cellFinalss + "/span[" + i + "]")).click();
-                break;
+                    driver.findElement(By.xpath(cellFinalss + "/span[" + i + "]")).click();
+                    break;
+                }
+                i++;
             }
-            i++;
-        }
 
 //        System.err.println(
 //                "==================================================");
-        infoShow100.click();
-        cariButton.click();
-        WebDriverWait wait = new WebDriverWait(driver, 100);
+            infoShow100.click();
+            cariButton.click();
+            WebDriverWait wait = new WebDriverWait(driver, 100);
 
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
 //        System.err.println(info.getText());
 
-        Thread.sleep(
-                100);
-        Thread.sleep(
-                100);
-        Thread.sleep(
-                100);
-        if (info.getText()
-                .equals(new String("Showing 0 to 0 of 0 entries"))) {
-            System.err.println("kosong");
-        } else {
-            // Grab the table
-            WebElement table = driver.findElement(By.xpath("//*[@id=\"stockTable\"]"));
-            int nextCount = 1;
-            while (nextCount < 63) // Now get all the TR elements from the table
-            {
-                Thread.sleep(3000);
+            if (info.getText()
+                    .equals(new String("Showing 0 to 0 of 0 entries"))) {
+                System.err.println("kosong");
+            } else {
+                // Grab the table
+                WebElement table = driver.findElement(By.xpath("//*[@id=\"stockTable\"]"));
+                int nextCount = 1;
+                while (nextCount < 10) // Now get all the TR elements from the table
+                {
 
-                WebDriverWait waits = new WebDriverWait(driver, 100);
+                    WebDriverWait waits = new WebDriverWait(driver, 100);
 
-                waits.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
-                WebElement next = driver.findElement(By.xpath("//*[@id=\"stockTable_next\"]"));
-                List<WebElement> allRows = table.findElements(By.tagName("tr"));
+                    waits.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
+                    WebElement next = driver.findElement(By.xpath("//*[@id=\"stockTable_next\"]"));
+                    List<WebElement> allRows = table.findElements(By.tagName("tr"));
 
 // And iterate over them, getting the cells
-                for (WebElement row : allRows) {
-                    IdxScrap idxScrap = new IdxScrap();
-                    IdxScrapPK idxScrapPK = new IdxScrapPK();
-                    IdxScrapJpaController controller = new IdxScrapJpaController();
-                    List<WebElement> cells = row.findElements(By.tagName("td"));
+                    for (WebElement row : allRows) {
+                        IdxScrap idxScrap = new IdxScrap();
+                        IdxScrapPK idxScrapPK = new IdxScrapPK();
+                        IdxScrapJpaController controller = new IdxScrapJpaController();
+                        List<WebElement> cells = row.findElements(By.tagName("td"));
 
-                    int indexTabel = 1;
-                    // Print the contents of each cell
-                    for (WebElement cell : cells) {
-                        if (indexTabel == 2) {
-                            idxScrapPK.setKodeSaham(cell.getText());
-                            System.err.println("idexTabel = " + indexTabel);
-                            System.err.println("setKodeSaham = " + idxScrapPK.getKodeSaham());
+                        int indexTabel = 1;
+                        // Print the contents of each cell
+                        for (WebElement cell : cells) {
+                            if (indexTabel == 2) {
+                                idxScrapPK.setKodeSaham(cell.getText());
+                                System.err.println("idexTabel = " + indexTabel);
+                                System.err.println("setKodeSaham = " + idxScrapPK.getKodeSaham());
+                            }
+                            if (indexTabel == 3) {
+                                idxScrap.setNamaPerusahaan(cell.getText());
+                            }
+                            if (indexTabel == 4) {
+                                idxScrap.setRemarks(cell.getText());
+                            }
+                            if (indexTabel == 5) {
+                                idxScrap.setSebelumnya(cell.getText());
+                            }
+                            if (indexTabel == 6) {
+                                idxScrap.setOpenPrice(cell.getText());
+                            }
+                            if (indexTabel == 7) {
+                                idxScrap.setFirstTrade(cell.getText());
+                            }
+                            if (indexTabel == 8) {
+                                idxScrap.setTertinggi(cell.getText());
+                            }
+                            if (indexTabel == 9) {
+                                idxScrap.setTerendah(cell.getText());
+                            }
+                            if (indexTabel == 10) {
+                                idxScrap.setPenutupan(cell.getText());
+                            }
+                            if (indexTabel == 11) {
+                                idxScrap.setSelisih(cell.getText());
+                            }
+                            if (indexTabel == 12) {
+                                idxScrap.setVolume(cell.getText());
+                            }
+                            if (indexTabel == 13) {
+                                idxScrap.setNilai(cell.getText());
+                            }
+                            if (indexTabel == 14) {
+                                idxScrap.setFrekuensi(cell.getText());
+                            }
+                            if (indexTabel == 15) {
+                                idxScrap.setIndexIndividual(cell.getText());
+                            }
+                            if (indexTabel == 16) {
+                                idxScrap.setListedShare(cell.getText());
+                            }
+                            if (indexTabel == 17) {
+                                idxScrap.setOffer(cell.getText());
+                            }
+                            if (indexTabel == 18) {
+                                idxScrap.setOfferVolume(cell.getText());
+                            }
+                            if (indexTabel == 19) {
+                                idxScrap.setBid(cell.getText());
+                            }
+                            if (indexTabel == 20) {
+                                idxScrap.setBidVolume(cell.getText());
+                            }
+                            if (indexTabel == 21) {
+                                idxScrap.setLastTradingDate(cell.getText());
+                            }
+                            if (indexTabel == 22) {
+                                idxScrap.setTradeableShare(cell.getText());
+                            }
+                            if (indexTabel == 23) {
+                                idxScrap.setWeightForIndex(cell.getText());
+                            }
+                            if (indexTabel == 24) {
+                                idxScrap.setForeignSell(cell.getText());
+                            }
+                            if (indexTabel == 25) {
+                                idxScrap.setForeignBuy(cell.getText());
+                            }
+                            if (indexTabel == 26) {
+                                idxScrap.setNonRegularVolume(cell.getText());
+                            }
+                            if (indexTabel == 27) {
+                                idxScrap.setNonRegularValue(cell.getText());
+                            }
+                            if (indexTabel == 28) {
+                                idxScrap.setNonRegularFrequency(cell.getText());
+                            }
+                            indexTabel++;
                         }
-                        if (indexTabel == 3) {
-                            idxScrap.setNamaPerusahaan(cell.getText());
+                        System.err.println("==================================================");
+                        boolean isEmpty = "".equals(idxScrapPK.getKodeSaham());
+                        if (idxScrapPK.getKodeSaham() != null) {
+                            idxScrapPK.setTanggal(dd);
+                            idxScrap.setIdxScrapPK(idxScrapPK);
+                            try {
+                                controller.create(idxScrap);
+
+                            } catch (Exception e) {
+                                break;
+                            }
+                            idxScrap = new IdxScrap();
+                            idxScrapPK = new IdxScrapPK();
+
                         }
-                        if (indexTabel == 4) {
-                            idxScrap.setRemarks(cell.getText());
-                        }
-                        if (indexTabel == 5) {
-                            idxScrap.setSebelumnya(cell.getText());
-                        }
-                        if (indexTabel == 6) {
-                            idxScrap.setOpenPrice(cell.getText());
-                        }
-                        if (indexTabel == 7) {
-                            idxScrap.setFirstTrade(cell.getText());
-                        }
-                        if (indexTabel == 8) {
-                            idxScrap.setTertinggi(cell.getText());
-                        }
-                        if (indexTabel == 9) {
-                            idxScrap.setTerendah(cell.getText());
-                        }
-                        if (indexTabel == 10) {
-                            idxScrap.setPenutupan(cell.getText());
-                        }
-                        if (indexTabel == 11) {
-                            idxScrap.setSelisih(cell.getText());
-                        }
-                        if (indexTabel == 12) {
-                            idxScrap.setVolume(cell.getText());
-                        }
-                        if (indexTabel == 13) {
-                            idxScrap.setNilai(cell.getText());
-                        }
-                        if (indexTabel == 14) {
-                            idxScrap.setFrekuensi(cell.getText());
-                        }
-                        if (indexTabel == 15) {
-                            idxScrap.setIndexIndividual(cell.getText());
-                        }
-                        if (indexTabel == 16) {
-                            idxScrap.setListedShare(cell.getText());
-                        }
-                        if (indexTabel == 17) {
-                            idxScrap.setOffer(cell.getText());
-                        }
-                        if (indexTabel == 18) {
-                            idxScrap.setOfferVolume(cell.getText());
-                        }
-                        if (indexTabel == 19) {
-                            idxScrap.setBid(cell.getText());
-                        }
-                        if (indexTabel == 20) {
-                            idxScrap.setBidVolume(cell.getText());
-                        }
-                        if (indexTabel == 21) {
-                            idxScrap.setLastTradingDate(cell.getText());
-                        }
-                        if (indexTabel == 22) {
-                            idxScrap.setTradeableShare(cell.getText());
-                        }
-                        if (indexTabel == 23) {
-                            idxScrap.setWeightForIndex(cell.getText());
-                        }
-                        if (indexTabel == 24) {
-                            idxScrap.setForeignSell(cell.getText());
-                        }
-                        if (indexTabel == 25) {
-                            idxScrap.setForeignBuy(cell.getText());
-                        }
-                        if (indexTabel == 26) {
-                            idxScrap.setNonRegularVolume(cell.getText());
-                        }
-                        if (indexTabel == 27) {
-                            idxScrap.setNonRegularValue(cell.getText());
-                        }
-                        if (indexTabel == 28) {
-                            idxScrap.setNonRegularFrequency(cell.getText());
-                        }
-                        indexTabel++;
                     }
-                    System.err.println("==================================================");
-                    boolean isEmpty = "".equals(idxScrapPK.getKodeSaham());
-                    if (idxScrapPK.getKodeSaham() != null) {
-                        idxScrapPK.setTanggal(dd);
-                        idxScrap.setIdxScrapPK(idxScrapPK);
-                        controller.create(idxScrap);
-                    }
+
+                    nextCount++;
+                    next.click();
                 }
-
-                nextCount++;
-                next.click();
-                Thread.sleep(1000);
             }
+            //close Fire fox
+            driver.close();
         }
-        //close Fire fox
-        driver.close();
     }
 
     private static void clickInput(WebDriver driver) {

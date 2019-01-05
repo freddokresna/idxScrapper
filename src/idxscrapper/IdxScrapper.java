@@ -81,7 +81,7 @@ public class IdxScrapper {
         WebElement leftMonthSelect = driver.findElement(By.xpath("/html/body/div/div[1]/span[1]"));
         WebElement cariButton = driver.findElement(By.xpath("/html/body/main/div[1]/div[5]/button"));
         WebElement info = driver.findElement(By.xpath("//*[@id=\"stockTable_info\"]"));
-
+        WebElement infoShow100 = driver.findElement(By.xpath("/html/body/main/div[2]/div/div[1]/div/div[1]/label/select/option[4]"));
         dateBox.click();
         yearInput.clear();
         yearInput.sendKeys(year);
@@ -124,6 +124,7 @@ public class IdxScrapper {
 
 //        System.err.println(
 //                "==================================================");
+        infoShow100.click();
         cariButton.click();
         WebDriverWait wait = new WebDriverWait(driver, 100);
 

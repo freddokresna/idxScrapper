@@ -23,6 +23,9 @@ import javax.persistence.criteria.Root;
  */
 public class IdxScrapJpaController implements Serializable {
 
+    public IdxScrapJpaController() {
+    }
+
     public IdxScrapJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }

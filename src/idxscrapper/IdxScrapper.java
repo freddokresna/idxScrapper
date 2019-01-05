@@ -5,6 +5,7 @@
  */
 package idxscrapper;
 
+import entity.IdxScrap;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -25,13 +26,20 @@ public class IdxScrapper {
      * @throws java.lang.Exception
      */
     public static void main(String[] args) throws Exception {
+        String month = "January";
+        String date = "3";
+        String year = "2019";
+
         System.err.println(System.getProperty("user.dir"));
         String OS = System.getProperty("os.name").toLowerCase();
-        if (OS.contains("win")) {
+
+        if (OS.contains(
+                "win")) {
             // declaration and instantiation of objects/variables
             System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-win64\\geckodriver.exe");
 
-        } else if (OS.contains("nix") || OS.contains("nux") || OS.indexOf("aix") > 0) {
+        } else if (OS.contains(
+                "nix") || OS.contains("nux") || OS.indexOf("aix") > 0) {
 
             // declaration and instantiation of objects/variables
             System.setProperty("webdriver.firefox.marionette", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-linux64\\geckodriver.exe");
@@ -48,9 +56,12 @@ public class IdxScrapper {
 
         // launch Fire fox and direct it to the Base URL
         driver.get(baseUrl);
-        new WebDriverWait(driver, 6000).until(
+
+        new WebDriverWait(driver,
+                6000).until(
                 webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
-        Thread.sleep(100);
+        Thread.sleep(
+                100);
         clickInput(driver);
 
         WebElement dateBox = driver.findElement(By.xpath("//*[@id=\"dateFilter\"]"));
@@ -59,56 +70,101 @@ public class IdxScrapper {
         WebElement leftMonthSelect = driver.findElement(By.xpath("/html/body/div/div[1]/span[1]"));
         WebElement cariButton = driver.findElement(By.xpath("/html/body/main/div[1]/div[5]/button"));
         WebElement info = driver.findElement(By.xpath("//*[@id=\"stockTable_info\"]"));
+
         dateBox.click();
         yearInput.clear();
-
-        yearInput.sendKeys(
-                "2016");
-        leftMonthSelect.click();
+        yearInput.sendKeys(year);
+        while (!monthInput.getText().equals(month)) {
+            leftMonthSelect.click();
+        }
 
         dateBox.click();
-        Thread.sleep(1000);
+
+        Thread.sleep(
+                1000);
 
         WebElement dataWidget = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[2]/div"));
         List<WebElement> columns = dataWidget.findElements(By.className("flatpickr-day"));
-        System.err.println("==================================================");
-        System.err.println(columns.size());
+
+//        System.err.println(
+//                "==================================================");
+//        System.err.println(columns.size());
         int i = 1;
         for (WebElement cell : columns) {
             //Select xx. Date
-            System.err.println(cell.getText() + "tagname" + cell.getTagName() + "xpath" + cell.getAttribute("xpath") + "gettext" + cell.getAttribute("innerHTML") + cell.getAttribute("class"));
+//            System.err.println(cell.getText() + "tagname" + cell.getTagName() + "xpath" + cell.getAttribute("xpath") + "gettext" + cell.getAttribute("innerHTML") + cell.getAttribute("class"));
             if (cell.getAttribute("class").contains("prevMonthDay") || cell.getAttribute("class").contains("nextMonthDay")) {
 
-            } else if (cell.getAttribute("innerHTML").equals("15")) {
+            } else if (cell.getAttribute("innerHTML").equals(date)) {
                 String cellString = cell.toString();
                 String cellAfet = cellString.substring(cellString.lastIndexOf("xpath:"));
                 String cellFinal = cellAfet.substring(0, cellAfet.lastIndexOf("->"));
                 String cellFinals = cellFinal.substring(0, cellFinal.lastIndexOf("]]")).trim();
                 String cellFinalss = cellFinals.replace("xpath:", "").trim();
 
-                ///html/body/div/div[2]/div/div[2]/div/span[19]
-                //html/body/div/div[2]/div/div[2]/div/span[21]
-                System.err.println(cellFinalss + "/span[" + i + "]");
-                System.err.println(
-                        driver.findElement(By.xpath(cellFinalss + "/span[" + i + "]")).getAttribute("innerHTML"));
+//                System.err.println(cellFinalss + "/span[" + i + "]");
+//                System.err.println(
+//                        driver.findElement(By.xpath(cellFinalss + "/span[" + i + "]")).getAttribute("innerHTML"));
                 driver.findElement(By.xpath(cellFinalss + "/span[" + i + "]")).click();
                 break;
             }
             i++;
         }
 
-        System.err.println(
-                "==================================================");
+//        System.err.println(
+//                "==================================================");
         cariButton.click();
         WebDriverWait wait = new WebDriverWait(driver, 100);
+
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
-        System.err.println(info.getText());
+//        System.err.println(info.getText());
+
+        Thread.sleep(
+                100);
+        Thread.sleep(
+                100);
+        Thread.sleep(
+                100);
         if (info.getText()
                 .equals(new String("Showing 0 to 0 of 0 entries"))) {
             System.err.println("kosong");
+        } else {
+            IdxScrap idxScrap = new IdxScrap();
+            IdxScrapJpaController controller = new IdxScrapJpaController();
+            // Grab the table
+            WebElement table = driver.findElement(By.xpath("//*[@id=\"stockTable\"]"));
+            int nextCount = 1;
+            while (nextCount < 63) // Now get all the TR elements from the table
+            {
+                Thread.sleep(1000);
+
+                WebDriverWait waits = new WebDriverWait(driver, 100);
+
+                waits.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
+                WebElement next = driver.findElement(By.xpath("//*[@id=\"stockTable_next\"]"));
+                List<WebElement> allRows = table.findElements(By.tagName("tr"));
+
+                System.err.println(
+                        "==================================================");
+// And iterate over them, getting the cells
+                for (WebElement row : allRows) {
+                    List<WebElement> cells = row.findElements(By.tagName("td"));
+
+                    // Print the contents of each cell
+                    for (WebElement cell : cells) {
+                        System.err.print(cell.getText() + "-");
+                    }
+                    System.err.println(
+                            "==================================================");
+                }
+                next.click();
+                Thread.sleep(1000);
+                nextCount++;
+            }
+            idxScrap.setBid(OS);
         }
         //close Fire fox
-//        driver.close();
+        driver.close();
     }
 
     private static void clickInput(WebDriver driver) {

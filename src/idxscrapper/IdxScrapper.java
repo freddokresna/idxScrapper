@@ -52,7 +52,8 @@ public class IdxScrapper {
                 "nix") || OS.contains("nux") || OS.indexOf("aix") > 0) {
 
             // declaration and instantiation of objects/variables
-            System.setProperty("webdriver.firefox.marionette", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-linux64\\geckodriver.exe");
+            System.err.println("System.getProperty(\"user.dir\") " + System.getProperty("user.dir"));
+            System.setProperty("webdriver.firefox.marionette", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-linux64\\geckodriver");
         } else {
             // declaration and instantiation of objects/variables
             throw new Exception("OS tidak di kenali");

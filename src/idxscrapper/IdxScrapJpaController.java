@@ -6,14 +6,16 @@
 package idxscrapper;
 
 import entity.IdxScrap;
-import idxscrapper.exceptions.NonexistentEntityException;
-import idxscrapper.exceptions.PreexistingEntityException;
+import entity.IdxScrapPK;
+import entity.exceptions.NonexistentEntityException;
+import entity.exceptions.PreexistingEntityException;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
@@ -29,13 +31,16 @@ public class IdxScrapJpaController implements Serializable {
     public IdxScrapJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    private EntityManagerFactory emf = null;
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("idxScrapperPU");
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
 
     public void create(IdxScrap idxScrap) throws PreexistingEntityException, Exception {
+        if (idxScrap.getIdxScrapPK() == null) {
+            idxScrap.setIdxScrapPK(new IdxScrapPK());
+        }
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -43,7 +48,7 @@ public class IdxScrapJpaController implements Serializable {
             em.persist(idxScrap);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findIdxScrap(idxScrap.getKodeSaham()) != null) {
+            if (findIdxScrap(idxScrap.getIdxScrapPK()) != null) {
                 throw new PreexistingEntityException("IdxScrap " + idxScrap + " already exists.", ex);
             }
             throw ex;
@@ -64,7 +69,7 @@ public class IdxScrapJpaController implements Serializable {
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                String id = idxScrap.getKodeSaham();
+                IdxScrapPK id = idxScrap.getIdxScrapPK();
                 if (findIdxScrap(id) == null) {
                     throw new NonexistentEntityException("The idxScrap with id " + id + " no longer exists.");
                 }
@@ -77,7 +82,7 @@ public class IdxScrapJpaController implements Serializable {
         }
     }
 
-    public void destroy(String id) throws NonexistentEntityException {
+    public void destroy(IdxScrapPK id) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -85,7 +90,7 @@ public class IdxScrapJpaController implements Serializable {
             IdxScrap idxScrap;
             try {
                 idxScrap = em.getReference(IdxScrap.class, id);
-                idxScrap.getKodeSaham();
+                idxScrap.getIdxScrapPK();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The idxScrap with id " + id + " no longer exists.", enfe);
             }
@@ -122,7 +127,7 @@ public class IdxScrapJpaController implements Serializable {
         }
     }
 
-    public IdxScrap findIdxScrap(String id) {
+    public IdxScrap findIdxScrap(IdxScrapPK id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(IdxScrap.class, id);

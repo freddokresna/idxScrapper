@@ -6,6 +6,10 @@
 package idxscrapper;
 
 import entity.IdxScrap;
+import entity.IdxScrapPK;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -29,6 +33,12 @@ public class IdxScrapper {
         String month = "January";
         String date = "3";
         String year = "2019";
+
+        String tanggal = year + "-" + month + "-" + date;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat fmts = new SimpleDateFormat("yyyy-MMMM-dd");
+        Date dd = fmts.parse(tanggal);
+        String tanggalDB = formatter.format(dd);
 
         System.err.println(System.getProperty("user.dir"));
         String OS = System.getProperty("os.name").toLowerCase();
@@ -129,14 +139,12 @@ public class IdxScrapper {
                 .equals(new String("Showing 0 to 0 of 0 entries"))) {
             System.err.println("kosong");
         } else {
-            IdxScrap idxScrap = new IdxScrap();
-            IdxScrapJpaController controller = new IdxScrapJpaController();
             // Grab the table
             WebElement table = driver.findElement(By.xpath("//*[@id=\"stockTable\"]"));
             int nextCount = 1;
             while (nextCount < 63) // Now get all the TR elements from the table
             {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
 
                 WebDriverWait waits = new WebDriverWait(driver, 100);
 
@@ -144,24 +152,114 @@ public class IdxScrapper {
                 WebElement next = driver.findElement(By.xpath("//*[@id=\"stockTable_next\"]"));
                 List<WebElement> allRows = table.findElements(By.tagName("tr"));
 
-                System.err.println(
-                        "==================================================");
 // And iterate over them, getting the cells
                 for (WebElement row : allRows) {
+                    IdxScrap idxScrap = new IdxScrap();
+                    IdxScrapPK idxScrapPK = new IdxScrapPK();
+                    IdxScrapJpaController controller = new IdxScrapJpaController();
                     List<WebElement> cells = row.findElements(By.tagName("td"));
 
+                    int indexTabel = 1;
                     // Print the contents of each cell
                     for (WebElement cell : cells) {
-                        System.err.print(cell.getText() + "-");
+                        if (indexTabel == 2) {
+                            idxScrapPK.setKodeSaham(cell.getText());
+                            System.err.println("idexTabel = " + indexTabel);
+                            System.err.println("setKodeSaham = " + idxScrapPK.getKodeSaham());
+                        }
+                        if (indexTabel == 3) {
+                            idxScrap.setNamaPerusahaan(cell.getText());
+                        }
+                        if (indexTabel == 4) {
+                            idxScrap.setRemarks(cell.getText());
+                        }
+                        if (indexTabel == 5) {
+                            idxScrap.setSebelumnya(cell.getText());
+                        }
+                        if (indexTabel == 6) {
+                            idxScrap.setOpenPrice(cell.getText());
+                        }
+                        if (indexTabel == 7) {
+                            idxScrap.setFirstTrade(cell.getText());
+                        }
+                        if (indexTabel == 8) {
+                            idxScrap.setTertinggi(cell.getText());
+                        }
+                        if (indexTabel == 9) {
+                            idxScrap.setTerendah(cell.getText());
+                        }
+                        if (indexTabel == 10) {
+                            idxScrap.setPenutupan(cell.getText());
+                        }
+                        if (indexTabel == 11) {
+                            idxScrap.setSelisih(cell.getText());
+                        }
+                        if (indexTabel == 12) {
+                            idxScrap.setVolume(cell.getText());
+                        }
+                        if (indexTabel == 13) {
+                            idxScrap.setNilai(cell.getText());
+                        }
+                        if (indexTabel == 14) {
+                            idxScrap.setFrekuensi(cell.getText());
+                        }
+                        if (indexTabel == 15) {
+                            idxScrap.setIndexIndividual(cell.getText());
+                        }
+                        if (indexTabel == 16) {
+                            idxScrap.setListedShare(cell.getText());
+                        }
+                        if (indexTabel == 17) {
+                            idxScrap.setOffer(cell.getText());
+                        }
+                        if (indexTabel == 18) {
+                            idxScrap.setOfferVolume(cell.getText());
+                        }
+                        if (indexTabel == 19) {
+                            idxScrap.setBid(cell.getText());
+                        }
+                        if (indexTabel == 20) {
+                            idxScrap.setBidVolume(cell.getText());
+                        }
+                        if (indexTabel == 21) {
+                            idxScrap.setLastTradingDate(cell.getText());
+                        }
+                        if (indexTabel == 22) {
+                            idxScrap.setTradeableShare(cell.getText());
+                        }
+                        if (indexTabel == 23) {
+                            idxScrap.setWeightForIndex(cell.getText());
+                        }
+                        if (indexTabel == 24) {
+                            idxScrap.setForeignSell(cell.getText());
+                        }
+                        if (indexTabel == 25) {
+                            idxScrap.setForeignBuy(cell.getText());
+                        }
+                        if (indexTabel == 26) {
+                            idxScrap.setNonRegularVolume(cell.getText());
+                        }
+                        if (indexTabel == 27) {
+                            idxScrap.setNonRegularValue(cell.getText());
+                        }
+                        if (indexTabel == 28) {
+                            idxScrap.setNonRegularFrequency(cell.getText());
+                        }
+                        indexTabel++;
                     }
-                    System.err.println(
-                            "==================================================");
+                    System.err.println("==================================================");
+                    boolean isEmpty = "".equals(idxScrapPK.getKodeSaham());
+                    if (idxScrapPK.getKodeSaham() != null) {
+                        idxScrapPK.setTanggal(dd);
+                        idxScrap.setIdxScrapPK(idxScrapPK);
+                        controller.create(idxScrap);
+                    }
                 }
+
+                nextCount++;
                 next.click();
                 Thread.sleep(1000);
-                nextCount++;
             }
-            idxScrap.setBid(OS);
         }
         //close Fire fox
         driver.close();

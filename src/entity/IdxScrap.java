@@ -6,11 +6,10 @@
 package entity;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import javax.persistence.Basic;
+import java.util.Date;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -26,7 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "IdxScrap.findAll", query = "SELECT i FROM IdxScrap i")
-    , @NamedQuery(name = "IdxScrap.findByKodeSaham", query = "SELECT i FROM IdxScrap i WHERE i.kodeSaham = :kodeSaham")
+    , @NamedQuery(name = "IdxScrap.findByKodeSaham", query = "SELECT i FROM IdxScrap i WHERE i.idxScrapPK.kodeSaham = :kodeSaham")
     , @NamedQuery(name = "IdxScrap.findByRemarks", query = "SELECT i FROM IdxScrap i WHERE i.remarks = :remarks")
     , @NamedQuery(name = "IdxScrap.findBySebelumnya", query = "SELECT i FROM IdxScrap i WHERE i.sebelumnya = :sebelumnya")
     , @NamedQuery(name = "IdxScrap.findByOpenPrice", query = "SELECT i FROM IdxScrap i WHERE i.openPrice = :openPrice")
@@ -51,22 +50,20 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "IdxScrap.findByForeignBuy", query = "SELECT i FROM IdxScrap i WHERE i.foreignBuy = :foreignBuy")
     , @NamedQuery(name = "IdxScrap.findByNonRegularVolume", query = "SELECT i FROM IdxScrap i WHERE i.nonRegularVolume = :nonRegularVolume")
     , @NamedQuery(name = "IdxScrap.findByNonRegularValue", query = "SELECT i FROM IdxScrap i WHERE i.nonRegularValue = :nonRegularValue")
-    , @NamedQuery(name = "IdxScrap.findByNonRegularFrequency", query = "SELECT i FROM IdxScrap i WHERE i.nonRegularFrequency = :nonRegularFrequency")})
+    , @NamedQuery(name = "IdxScrap.findByNonRegularFrequency", query = "SELECT i FROM IdxScrap i WHERE i.nonRegularFrequency = :nonRegularFrequency")
+    , @NamedQuery(name = "IdxScrap.findByTanggal", query = "SELECT i FROM IdxScrap i WHERE i.idxScrapPK.tanggal = :tanggal")})
 public class IdxScrap implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Id
-    @Basic(optional = false)
-    @Column(name = "kode_saham")
-    private String kodeSaham;
+    @EmbeddedId
+    protected IdxScrapPK idxScrapPK;
     @Lob
     @Column(name = "nama_perusahaan")
     private String namaPerusahaan;
     @Column(name = "remarks")
     private String remarks;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "sebelumnya")
-    private BigDecimal sebelumnya;
+    private String sebelumnya;
     @Column(name = "open_price")
     private String openPrice;
     @Column(name = "first_trade")
@@ -117,16 +114,20 @@ public class IdxScrap implements Serializable {
     public IdxScrap() {
     }
 
-    public IdxScrap(String kodeSaham) {
-        this.kodeSaham = kodeSaham;
+    public IdxScrap(IdxScrapPK idxScrapPK) {
+        this.idxScrapPK = idxScrapPK;
     }
 
-    public String getKodeSaham() {
-        return kodeSaham;
+    public IdxScrap(String kodeSaham, Date tanggal) {
+        this.idxScrapPK = new IdxScrapPK(kodeSaham, tanggal);
     }
 
-    public void setKodeSaham(String kodeSaham) {
-        this.kodeSaham = kodeSaham;
+    public IdxScrapPK getIdxScrapPK() {
+        return idxScrapPK;
+    }
+
+    public void setIdxScrapPK(IdxScrapPK idxScrapPK) {
+        this.idxScrapPK = idxScrapPK;
     }
 
     public String getNamaPerusahaan() {
@@ -145,11 +146,11 @@ public class IdxScrap implements Serializable {
         this.remarks = remarks;
     }
 
-    public BigDecimal getSebelumnya() {
+    public String getSebelumnya() {
         return sebelumnya;
     }
 
-    public void setSebelumnya(BigDecimal sebelumnya) {
+    public void setSebelumnya(String sebelumnya) {
         this.sebelumnya = sebelumnya;
     }
 
@@ -340,7 +341,7 @@ public class IdxScrap implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (kodeSaham != null ? kodeSaham.hashCode() : 0);
+        hash += (idxScrapPK != null ? idxScrapPK.hashCode() : 0);
         return hash;
     }
 
@@ -351,7 +352,7 @@ public class IdxScrap implements Serializable {
             return false;
         }
         IdxScrap other = (IdxScrap) object;
-        if ((this.kodeSaham == null && other.kodeSaham != null) || (this.kodeSaham != null && !this.kodeSaham.equals(other.kodeSaham))) {
+        if ((this.idxScrapPK == null && other.idxScrapPK != null) || (this.idxScrapPK != null && !this.idxScrapPK.equals(other.idxScrapPK))) {
             return false;
         }
         return true;
@@ -359,7 +360,7 @@ public class IdxScrap implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.IdxScrap[ kodeSaham=" + kodeSaham + " ]";
+        return "entity.IdxScrap[ idxScrapPK=" + idxScrapPK + " ]";
     }
 
 }

@@ -11,6 +11,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -19,6 +20,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
@@ -32,59 +34,67 @@ public class IdxScrapper {
      * @throws java.lang.Exception
      */
     public static void main(String[] args) throws Exception {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -26); // number represents number of days
+        Date yesterday = cal.getTime();
+
+        System.out.println("Yesterday's date is: " + yesterday);
+
+        DateFormat dateFormatone = new SimpleDateFormat("yyyy-MM-dd");
+        Date dateone = new Date();
+        System.out.println(dateFormatone.format(dateone));
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat fmts = new SimpleDateFormat("yyyy-MMMM-dd");
-        Date startDate = formatter.parse("2015-01-14");
-        Date endDate = formatter.parse("2018-12-30");
+//        Date startDate = yesterday;
+        Date startDate = formatter.parse("2019-02-08");;
+        Date endDate = formatter.parse(dateFormatone.format(dateone));
+        System.err.println(startDate + "---" + endDate);
         LocalDate start = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate end = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        for (LocalDate dates = start; dates.isBefore(end); dates = dates.plusDays(1)) {
+        System.err.println(System.getProperty("user.dir"));
+        String OS = System.getProperty("os.name").toLowerCase();
 
+        if (OS.contains(
+                "win")) {
+            // declaration and instantiation of objects/variables
+            System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-win64\\geckodriver.exe");
+
+        } else if (OS.contains(
+                "nix") || OS.contains("nux") || OS.indexOf("aix") > 0) {
+
+            // declaration and instantiation of objects/variables
+            System.err.println("System.getProperty(\"user.dir\") " + System.getProperty("user.dir") + "/lib/geckodriver-v0.23.0-linux64/geckodriver");
+            System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "/lib/geckodriver-v0.23.0-linux64/geckodriver");
+        } else {
+            // declaration and instantiation of objects/variables
+            throw new Exception("OS tidak di kenali");
+        }
+        WebDriver driver = new FirefoxDriver();
+        //comment the above 2 lines and uncomment below 2 lines to use Chrome
+        //System.setProperty("webdriver.chrome.driver","G:\\chromedriver.exe");
+        //WebDriver driver = new ChromeDriver();
+
+        String baseUrl = "https://www.idx.co.id/data-pasar/ringkasan-perdagangan/ringkasan-saham/";
+
+        // launch Fire fox and direct it to the Base URL
+        driver.get(baseUrl);
+
+        new WebDriverWait(driver,
+                6000).until(
+                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+        Thread.sleep(
+                1000);
+        clickInput(driver);
+
+        for (LocalDate dates = start; dates.isBefore(end); dates = dates.plusDays(1)) {
             String month = dates.getMonth().toString();
             String date = String.valueOf(dates.getDayOfMonth());
             String year = String.valueOf(dates.getYear());
-
             String tanggal = year + "-" + month + "-" + date;
             Date dd = fmts.parse(tanggal);
             String tanggalDB = formatter.format(dd);
-
-            System.err.println(System.getProperty("user.dir"));
-            String OS = System.getProperty("os.name").toLowerCase();
-
-            if (OS.contains(
-                    "win")) {
-                // declaration and instantiation of objects/variables
-                System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-win64\\geckodriver.exe");
-
-            } else if (OS.contains(
-                    "nix") || OS.contains("nux") || OS.indexOf("aix") > 0) {
-
-                // declaration and instantiation of objects/variables
-                System.err.println("System.getProperty(\"user.dir\") " + System.getProperty("user.dir"));
-                System.setProperty("webdriver.firefox.marionette", System.getProperty("user.dir") + "\\lib\\geckodriver-v0.23.0-linux64\\geckodriver");
-            } else {
-                // declaration and instantiation of objects/variables
-                throw new Exception("OS tidak di kenali");
-            }
-            WebDriver driver = new FirefoxDriver();
-            //comment the above 2 lines and uncomment below 2 lines to use Chrome
-            //System.setProperty("webdriver.chrome.driver","G:\\chromedriver.exe");
-            //WebDriver driver = new ChromeDriver();
-
-            String baseUrl = "https://www.idx.co.id/data-pasar/ringkasan-perdagangan/ringkasan-saham/";
-
-            // launch Fire fox and direct it to the Base URL
-            driver.get(baseUrl);
-
-            new WebDriverWait(driver,
-                    6000).until(
-                    webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
-            Thread.sleep(
-                    100);
-            clickInput(driver);
-
             WebElement dateBox = driver.findElement(By.xpath("//*[@id=\"dateFilter\"]"));
             WebElement yearInput = driver.findElement(By.xpath("/html/body/div/div[1]/div/div/input"));
             WebElement monthInput = driver.findElement(By.xpath("/html/body/div/div[1]/div/span"));
@@ -93,16 +103,22 @@ public class IdxScrapper {
             WebElement info = driver.findElement(By.xpath("//*[@id=\"stockTable_info\"]"));
             WebElement infoShow100 = driver.findElement(By.xpath("/html/body/main/div[2]/div/div[1]/div/div[1]/label/select/option[4]"));
             dateBox.click();
+            new WebDriverWait(driver,
+                    6000).until(presenceOfElementLocated(By.xpath("/html/body/div/div[1]/span[1]")));
+            System.err.println(driver.findElement(By.xpath("/html/body/div/div[1]/span[1]")).getText().toLowerCase());
+            System.err.println(month.toLowerCase());
+            System.err.println(monthInput.getText().toLowerCase());
             while (!monthInput.getText().toLowerCase().equals(month.toLowerCase())) {
-                leftMonthSelect.click();
+                driver.findElement(By.xpath("/html/body/div/div[1]/span[1]")).click();
+                monthInput = driver.findElement(By.xpath("/html/body/div/div[1]/div/span"));
             }
+            dateBox = driver.findElement(By.xpath("//*[@id=\"dateFilter\"]"));
+            yearInput = driver.findElement(By.xpath("/html/body/div/div[1]/div/div/input"));
+
             yearInput.clear();
             yearInput.sendKeys(year);
 
             dateBox.click();
-
-            Thread.sleep(
-                    1000);
 
             WebElement dataWidget = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[2]/div"));
             List<WebElement> columns = dataWidget.findElements(By.className("flatpickr-day"));
@@ -139,6 +155,8 @@ public class IdxScrapper {
             WebDriverWait wait = new WebDriverWait(driver, 100);
 
             wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
+            Thread.sleep(
+                    3000);
 //        System.err.println(info.getText());
 
             if (info.getText()
@@ -148,9 +166,11 @@ public class IdxScrapper {
                 // Grab the table
                 WebElement table = driver.findElement(By.xpath("//*[@id=\"stockTable\"]"));
                 int nextCount = 1;
-                while (nextCount < 10) // Now get all the TR elements from the table
+                while (nextCount < 8) // Now get all the TR elements from the table
                 {
 
+                    Thread.sleep(
+                            2000);
                     WebDriverWait waits = new WebDriverWait(driver, 100);
 
                     waits.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
@@ -261,7 +281,9 @@ public class IdxScrapper {
                                 controller.create(idxScrap);
 
                             } catch (Exception e) {
-                                break;
+//                                break;
+                                System.err.println("something happen!!!");
+                                e.printStackTrace();
                             }
                             idxScrap = new IdxScrap();
                             idxScrapPK = new IdxScrapPK();
@@ -271,11 +293,13 @@ public class IdxScrapper {
 
                     nextCount++;
                     next.click();
+                    Thread.sleep(
+                            2000);
                 }
             }
-            //close Fire fox
-            driver.close();
         }
+        //close Fire fox
+        driver.close();
     }
 
     private static void clickInput(WebDriver driver) {

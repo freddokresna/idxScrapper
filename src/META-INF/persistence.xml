@@ -3,11 +3,17 @@
     <persistence-unit name="idxScrapperPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <class>entity.IdxScrap</class>
+        <shared-cache-mode>NONE</shared-cache-mode>
+        <validation-mode>NONE</validation-mode>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/harga_saham_idx?zeroDateTimeBehavior=convertToNull"/>
-            <property name="javax.persistence.jdbc.user" value="root"/>
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="javax.persistence.jdbc.password" value="root"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://159.89.196.235:3306/harga_saham_idx?zeroDateTimeBehavior=convertToNull&amp;serverTimezone=UTC"/>
+            <property name="javax.persistence.jdbc.user" value="remote"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.password" value="r3m0t3"/>
+            <property name="eclipselink.jdbc.batch-writing" value="JDBC"/>
+            <property name="eclipselink.jdbc.batch-writing.size" value="100"/>
+            <property name="eclipselink.jdbc.cache-statements" value="true"/>
+            <property name="eclipselink.logging.level" value="off"/>
         </properties>
     </persistence-unit>
 </persistence>

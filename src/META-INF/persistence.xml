@@ -6,7 +6,7 @@
         <shared-cache-mode>NONE</shared-cache-mode>
         <validation-mode>NONE</validation-mode>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://159.89.196.235:3306/harga_saham_idx?zeroDateTimeBehavior=convertToNull&amp;serverTimezone=UTC"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://159.89.196.235:3306/harga_saham_idx?zeroDateTimeBehavior=convertToNull&amp;useLegacyDatetimeCode=false&amp;serverTimezone=Asia/Jakarta"/>
             <property name="javax.persistence.jdbc.user" value="remote"/>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.password" value="r3m0t3"/>

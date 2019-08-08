@@ -35,7 +35,7 @@ public class IdxScrapper {
      */
     public static void main(String[] args) throws Exception {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -26); // number represents number of days
+        cal.add(Calendar.DATE, -177); // number represents number of days
         Date yesterday = cal.getTime();
 
         System.out.println("Yesterday's date is: " + yesterday);
@@ -46,8 +46,8 @@ public class IdxScrapper {
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat fmts = new SimpleDateFormat("yyyy-MMMM-dd");
-//        Date startDate = yesterday;
-        Date startDate = formatter.parse("2019-02-08");;
+        Date startDate = yesterday;
+//        Date startDate = formatter.parse("2019-02-13");
         Date endDate = formatter.parse(dateFormatone.format(dateone));
         System.err.println(startDate + "---" + endDate);
         LocalDate start = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -89,6 +89,16 @@ public class IdxScrapper {
         clickInput(driver);
 
         for (LocalDate dates = start; dates.isBefore(end); dates = dates.plusDays(1)) {
+            System.out.println("----------------------------------------------------------------------");
+            System.out.println("----------------------------------------------------------------------");
+            System.out.println("----------------------------------------------------------------------");
+            System.out.println("----------------------------------------------------------------------");
+            System.out.println(dates.toString() + " = " + start.toString()
+            );
+            System.out.println("----------------------------------------------------------------------");
+            System.out.println("----------------------------------------------------------------------");
+            System.out.println("----------------------------------------------------------------------");
+            System.out.println("----------------------------------------------------------------------");
             String month = dates.getMonth().toString();
             String date = String.valueOf(dates.getDayOfMonth());
             String year = String.valueOf(dates.getYear());
@@ -277,6 +287,7 @@ public class IdxScrapper {
                         if (idxScrapPK.getKodeSaham() != null) {
                             idxScrapPK.setTanggal(dd);
                             idxScrap.setIdxScrapPK(idxScrapPK);
+                            System.err.println(idxScrap.getIdxScrapPK().toString());
                             try {
                                 controller.create(idxScrap);
 

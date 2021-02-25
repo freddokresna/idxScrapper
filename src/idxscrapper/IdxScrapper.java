@@ -35,7 +35,7 @@ public class IdxScrapper {
      */
     public static void main(String[] args) throws Exception {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -177); // number represents number of days
+        cal.add(Calendar.DATE, -365); // number represents number of days
         Date yesterday = cal.getTime();
 
         System.out.println("Yesterday's date is: " + yesterday);
@@ -112,6 +112,7 @@ public class IdxScrapper {
             WebElement cariButton = driver.findElement(By.xpath("/html/body/main/div[1]/div[5]/button"));
             WebElement info = driver.findElement(By.xpath("//*[@id=\"stockTable_info\"]"));
             WebElement infoShow100 = driver.findElement(By.xpath("/html/body/main/div[2]/div/div[1]/div/div[1]/label/select/option[4]"));
+
             dateBox.click();
             new WebDriverWait(driver,
                     6000).until(presenceOfElementLocated(By.xpath("/html/body/div/div[1]/span[1]")));
@@ -162,7 +163,7 @@ public class IdxScrapper {
 //                "==================================================");
             infoShow100.click();
             cariButton.click();
-            WebDriverWait wait = new WebDriverWait(driver, 100);
+            WebDriverWait wait = new WebDriverWait(driver, 10000);
 
             wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
             Thread.sleep(
@@ -181,7 +182,7 @@ public class IdxScrapper {
 
                     Thread.sleep(
                             2000);
-                    WebDriverWait waits = new WebDriverWait(driver, 100);
+                    WebDriverWait waits = new WebDriverWait(driver, 10000);
 
                     waits.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
                     WebElement next = driver.findElement(By.xpath("//*[@id=\"stockTable_next\"]"));
@@ -293,19 +294,24 @@ public class IdxScrapper {
 
                             } catch (Exception e) {
 //                                break;
-                                System.err.println("something happen!!!");
-                                e.printStackTrace();
+//                                System.err.println("something happen!!!");
+//                                e.printStackTrace();
                             }
                             idxScrap = new IdxScrap();
                             idxScrapPK = new IdxScrapPK();
 
                         }
+                        try {
+                            WebElement closeButton = driver.findElement(By.xpath("/html/body/div[1]/div[3]/button"));
+                            closeButton.click();
+                        } catch (Exception e) {
+                            System.err.println("errornya ");
+//                            e.printStackTrace();
+                        }
                     }
-
                     nextCount++;
                     next.click();
-                    Thread.sleep(
-                            2000);
+                    Thread.sleep(1000);
                 }
             }
         }

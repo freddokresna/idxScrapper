@@ -35,7 +35,7 @@ public class IdxScrapper {
      */
     public static void main(String[] args) throws Exception {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -365); // number represents number of days
+        cal.add(Calendar.DATE, -335); // number represents number of days
         Date yesterday = cal.getTime();
 
         System.out.println("Yesterday's date is: " + yesterday);
@@ -164,8 +164,15 @@ public class IdxScrapper {
             infoShow100.click();
             cariButton.click();
             WebDriverWait wait = new WebDriverWait(driver, 10000);
+            try {
 
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
+                wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
+            } catch (Exception e) {
+//                            System.err.println("errornya ");
+//                            e.printStackTrace();
+
+                wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
+            }
             Thread.sleep(
                     3000);
 //        System.err.println(info.getText());
@@ -180,9 +187,17 @@ public class IdxScrapper {
                 while (nextCount < 8) // Now get all the TR elements from the table
                 {
 
-                    Thread.sleep(
-                            2000);
+                    Thread.sleep(2000);
                     WebDriverWait waits = new WebDriverWait(driver, 10000);
+                    try {
+
+                        WebElement closeButton = driver.findElement(By.xpath("/html/body/div[1]/div[3]/button"));
+                        closeButton.click();
+                    } catch (Exception e) {
+//                            System.err.println("errornya ");
+//                            e.printStackTrace();
+                        waits.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
+                    }
 
                     waits.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@id=\"stockTable_processing\"]")));
                     WebElement next = driver.findElement(By.xpath("//*[@id=\"stockTable_next\"]"));
@@ -193,6 +208,15 @@ public class IdxScrapper {
                         IdxScrap idxScrap = new IdxScrap();
                         IdxScrapPK idxScrapPK = new IdxScrapPK();
                         IdxScrapJpaController controller = new IdxScrapJpaController();
+                        try {
+                            List<WebElement> cells = row.findElements(By.tagName("td"));
+                        } catch (Exception e) {
+                            System.err.println("errornya ");
+//                            e.printStackTrace();
+                            WebElement closeButton = driver.findElement(By.xpath("/html/body/div[1]/div[3]/button"));
+                            closeButton.click();
+
+                        }
                         List<WebElement> cells = row.findElements(By.tagName("td"));
 
                         int indexTabel = 1;
@@ -294,7 +318,7 @@ public class IdxScrapper {
 
                             } catch (Exception e) {
 //                                break;
-//                                System.err.println("something happen!!!");
+                                System.err.println("something happen!!!");
 //                                e.printStackTrace();
                             }
                             idxScrap = new IdxScrap();
@@ -309,9 +333,21 @@ public class IdxScrapper {
 //                            e.printStackTrace();
                         }
                     }
-                    nextCount++;
-                    next.click();
-                    Thread.sleep(1000);
+                    try {
+
+                        nextCount++;
+                        next.click();
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                        WebElement closeButton = driver.findElement(By.xpath("/html/body/div[1]/div[3]/button"));
+                        closeButton.click();
+
+                        nextCount++;
+                        next.click();
+                        Thread.sleep(1000);
+//                            System.err.println("errornya ");
+//                            e.printStackTrace();
+                    }
                 }
             }
         }
